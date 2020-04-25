@@ -1,0 +1,72 @@
+﻿@page "/"
+@using BandBookerWasm.Shared.Models;
+
+<h2>Instruments</h2>
+
+<DxDataGrid KeyFieldName="@nameof(Instrument.Id)"
+			Data="@Instruments"
+			ShowFilterRow="false"
+			ShowPager="false"
+			RowInserting="@InstrumentInsertAction"
+			RowUpdating="@InstrumentUpdateAction"
+			RowRemoving="@InstrumentRemoveAction">
+	<Columns>
+		<DxDataGridCommandColumn Width="150px" />
+		<DxDataGridColumn Field="@nameof(Instrument.Name)" Caption="Instrument" />
+	</Columns>
+</DxDataGrid>
+
+<br />
+<br />
+<h2>Musicians</h2>
+
+<DxDataGrid @ref="gridMusicians" 
+			@key="keyMusicians"
+			KeyFieldName="@nameof(Musician.Id)"
+			Data="@Musicians"
+			ShowFilterRow="false"
+			ShowPager="false"
+			RowInsertStart="@(() => OnMusicianEditing(null))"			
+			RowEditStart="@((musician) => OnMusicianEditing(musician))"			
+			RowRemoving="@((musician) => OnMusicianRemoving(musician))">
+	<Columns>
+		<DxDataGridCommandColumn Width="150px" />
+		<DxDataGridColumn Field="@nameof(Instrument.Name)" Caption="Instrument" />
+	</Columns>
+	<EditFormTemplate>
+		<EditForm Model="@MusicianModel" Context="MusicianEditCtx" OnValidSubmit="@MusicianSubmitAction">
+			<DataAnnotationsValidator />
+			<DxFormLayout>
+				<DxFormLayoutItem Caption="Musician name:" ColSpanMd="12" Context="MusicianEditFormCtx">
+					<Template>
+						<DxTextBox @bind-Text="@MusicianModel.Name" />
+					</Template>
+				</DxFormLayoutItem>
+				<DxFormLayoutItem Caption="Instruments:" ColSpanMd="12" Context="MusicianEditFormCtx">
+					<Template>
+						<DxTagBox NullText="Select the instruments this musician plays"
+							Data="@Instruments"
+							@bind-SelectedItems="@MusicianModel.Instruments"
+							TextFieldName="Name" />
+					</Template>
+				</DxFormLayoutItem>
+
+				<DxFormLayoutItem ColSpanMd="12" Context="MusicianEditFormCtx">
+					<Template>
+						<ValidationSummary />
+					</Template>
+				</DxFormLayoutItem>
+				<DxFormLayoutItem ColSpanMd="12" Context="MusicianEditFormCtx">
+					<Template>
+						<div class="dxbs-fl-ctrl dxbs-fl-ctrl-nc text-right">
+							<button class="btn btn-link" type="submit">Update</button>
+							<button class="btn btn-link" type="button" @onclick="@OnMusicianCancelButtonClick">Cancel</button>
+						</div>
+					</Template>
+				</DxFormLayoutItem>
+			</DxFormLayout>
+		</EditForm>
+	</EditFormTemplate>
+</DxDataGrid>
+<br />
+<br />

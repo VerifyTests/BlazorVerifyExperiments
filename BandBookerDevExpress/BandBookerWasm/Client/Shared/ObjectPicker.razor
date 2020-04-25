@@ -1,0 +1,245 @@
+﻿@typeparam TItem
+
+<table style="width:100%">
+    <tr>
+        <td style="width:45%;" valign="top">
+            All @ItemTypePlural<br />
+        </td>
+        <td style="width:10%;" valign="top">
+            <span>&nbsp;</span>
+        </td>
+        <td style="width:45%;" valign="top">
+            Selected @ItemTypePlural<br />
+        </td>
+    </tr>
+    <tr>
+        <td style="width:45%;" valign="top">
+            <select @onchange="ItemSelectedFromAllItems"
+                    size="10" style="width:100%;">
+                @foreach (var Item in AllItems)
+                {
+                    if (@ItemValue(Item) == @ItemValue(SelectedItem))
+                    {
+                        <option selected value="@ItemValue(Item)">
+                            @ItemText(Item)
+                        </option>
+                    }
+                    else
+                    {
+                        <option value="@ItemValue(Item)">
+                            @ItemText(Item)
+                        </option>
+                    }
+                }
+            </select>
+        </td>
+        <td style="width:10%;" valign="top">
+            <button @onclick="AddSelectedItem"
+                    type="button"
+                    disabled="@AddSelectedItemButtonDisabled"
+                    style="width:100%;">
+                &gt;
+            </button><br />
+            <button @onclick="@AddAllItems"
+                    type="button"
+                    style="width:100%;">
+                &gt;&gt;
+            </button><br />
+            <button @onclick="@RemoveSelectedItem"
+                    type="button"
+                    disabled="@RemoveSelectedItemButtonDisabled"
+                    style="width:100%;">
+                &lt;
+            </button><br />
+            <button @onclick="@RemoveAllItems"
+                    type="button"
+                    style="width:100%;">
+                &lt;&lt;
+            </button><br />
+        </td>
+        <td style="width:45%;" valign="top">
+            <select @onchange="ItemSelectedFromSelectedItems"
+                    size="10" style="width:100%;">
+                @foreach (var Item in SelectedItems)
+                {
+                    if (@ItemValue(Item) == @ItemValue(SelectedItem))
+                    {
+                        <option selected value="@ItemValue(Item)">
+                            @ItemText(Item)
+                        </option>
+                    }
+                    else
+                    {
+                        <option value="@ItemValue(Item)">
+                            @ItemText(Item)
+                        </option>
+                    }
+                }
+            </select>
+
+        </td>
+    </tr>
+</table>
+
+@code {
+
+    [Parameter]
+    public string ItemType { get; set; }
+
+    [Parameter]
+    public string ItemTypePlural { get; set; }
+
+    [Parameter]
+    public string TextPropertyName { get; set; }
+
+    [Parameter]
+    public string ValuePropertyName { get; set; }
+
+    [Parameter]
+    public List<TItem> AllItems { get; set; }
+
+    [Parameter] public List<TItem> SelectedItems { get; set; }
+
+    TItem SelectedItem { get; set; }
+
+    bool AddSelectedItemButtonDisabled = true;
+    bool RemoveSelectedItemButtonDisabled = true;
+
+    private string ItemValue(TItem Item)
+    {
+        return Item.GetType()
+        .GetProperty(ValuePropertyName)
+        .GetValue(Item, null)
+        .ToString();
+    }
+
+    private string ItemText(TItem Item)
+    {
+        return Item.GetType()
+        .GetProperty(TextPropertyName)
+        .GetValue(Item, null)
+        .ToString();
+    }
+
+    protected override void OnParametersSet()
+    {
+        if (AllItems.Count > 0)
+        {
+            // remove the items that exist in SelectedItems
+            foreach (var item in SelectedItems)
+            {
+                var id = item.GetType()
+                .GetProperty(ValuePropertyName)
+                .GetValue(item, null)
+                .ToString();
+
+                var ItemFromAllItems =
+                (from x in AllItems
+                 where x.GetType()
+                 .GetProperty(ValuePropertyName)
+                 .GetValue(x, null)
+                 .ToString() == id
+                 select x).FirstOrDefault();
+
+                if (ItemFromAllItems != null)
+                {
+                    AllItems.Remove(ItemFromAllItems);
+                }
+            }
+
+        }
+        if (AllItems.Count > 0)
+        {
+            SelectedItem = AllItems.First();
+        }
+        else if (SelectedItems.Count > 0)
+        {
+            SelectedItem = SelectedItems.First();
+        }
+        UpdateButtonEnabledStates();
+    }
+
+    void ItemSelectedFromAllItems(ChangeEventArgs args)
+    {
+        SelectedItem =
+        (from x in AllItems
+         where x.GetType()
+     .GetProperty(ValuePropertyName)
+     .GetValue(x, null)
+     .ToString() == args.Value.ToString()
+         select x).FirstOrDefault();
+
+        UpdateButtonEnabledStates();
+    }
+
+    void UpdateButtonEnabledStates()
+    {
+        AddSelectedItemButtonDisabled = !AllItems.Contains(SelectedItem);
+        RemoveSelectedItemButtonDisabled = !SelectedItems.Contains(SelectedItem);
+    }
+
+    void AddAllItems()
+    {
+        foreach (var Item in AllItems.ToArray())
+        {
+            SelectedItems.Add(Item);
+        }
+        if (SelectedItems.Count > 0)
+        {
+            SelectedItem = SelectedItems.First();
+        }
+        AllItems.Clear();
+        UpdateButtonEnabledStates();
+    }
+
+    void RemoveAllItems()
+    {
+        foreach (var Item in SelectedItems.ToArray())
+        {
+            AllItems.Add(Item);
+        }
+        if (AllItems.Count > 0)
+        {
+            SelectedItem = AllItems.First();
+        }
+        SelectedItems.Clear();
+        UpdateButtonEnabledStates();
+    }
+
+    void AddSelectedItem()
+    {
+        if ((from x in SelectedItems
+             where ItemValue(x) == ItemValue(SelectedItem)
+             select x).FirstOrDefault() == null)
+        {
+            SelectedItems.Add(SelectedItem);
+            AllItems.Remove(SelectedItem);
+            UpdateButtonEnabledStates();
+        }
+    }
+
+    void RemoveSelectedItem()
+    {
+        if ((from x in AllItems
+             where ItemValue(x) == ItemValue(SelectedItem)
+             select x).FirstOrDefault() == null)
+        {
+            AllItems.Add(SelectedItem);
+            SelectedItems.Remove(SelectedItem);
+            UpdateButtonEnabledStates();
+        }
+    }
+
+    void ItemSelectedFromSelectedItems(ChangeEventArgs args)
+    {
+        SelectedItem =
+        (from x in SelectedItems
+         where x.GetType()
+         .GetProperty(ValuePropertyName)
+         .GetValue(x, null)
+         .ToString() == args.Value.ToString()
+         select x
+        ).FirstOrDefault();
+        UpdateButtonEnabledStates();
+    }
+}

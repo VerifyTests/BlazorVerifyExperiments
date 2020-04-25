@@ -1,0 +1,95 @@
+﻿@using Microsoft.AspNetCore.Components.Web;
+@using BandBookerWasm.Shared.Models;
+@inject IJSRuntime js;
+
+<DxPopup CssClass="custom-popup" HeaderText="@InstrumentEditingCaption"
+         @bind-Visible="@ShowPopup">
+	<ChildContent>
+		<EditForm Model="@editInstrument" OnValidSubmit="@OkButtonClick">
+			<DataAnnotationsValidator />
+			<ValidationSummary />
+			Name:
+			<InputText id="instrument.name" @bind-Value="@editInstrument.Name"
+					                    type="text" style="width:100%;" />
+		</EditForm>
+
+	</ChildContent>
+    <FooterTemplate>
+		<div class="modal-footer">
+			<button type="button" class="btn btn-primary" @onclick="@OkButtonClick">OK</button>
+			<button type="button" class="btn btn-primary" @onclick="@CancelButtonClick">Cancel</button>
+		</div>
+    </FooterTemplate>
+</DxPopup>
+
+@code {
+	static readonly Dictionary<CtrlMode, string> popupCaption = new Dictionary<CtrlMode, string> {
+			{CtrlMode.cmBrowse, "Browse {0}s" },
+			{CtrlMode.cmEdit, "Editing {0}" },
+			{CtrlMode.cmInsert, "Inserting {0}" }
+	};
+
+	public enum CtrlMode
+	{
+		cmBrowse = 0,
+		cmInsert = 1,
+		cmEdit = 2
+	}
+
+	public bool ShowPopup { get; set; }
+	public CtrlMode PopupMode { get; set; } = CtrlMode.cmBrowse;
+	public string InstrumentEditingCaption { get => String.Format(popupCaption[PopupMode], "Instrument"); }
+
+	[Parameter]
+	public EventCallback<string> CancelPressed { get; set; }
+
+	[Parameter]
+	public EventCallback<Instrument> OkPressed{ get; set; }
+	
+	private Instrument originalItem = null;
+	private Instrument editInstrument = new Instrument();
+
+	public void NewInstrument()
+	{
+		editInstrument = new Instrument();
+		PopupMode = CtrlMode.cmInsert;
+		ShowPopup = true;
+		js.InvokeVoidAsync("SetFocus", "instrument.name");
+		InvokeAsync(StateHasChanged);
+	
+	}
+
+	public void EditInstrument(Instrument item)
+	{
+		originalItem = item;
+		editInstrument = new Instrument
+		{
+			Id = item.Id,
+			Name = item.Name
+		};
+		PopupMode = CtrlMode.cmInsert;
+		ShowPopup = true;
+		js.InvokeVoidAsync("SetFocus", "instrument.name");
+		InvokeAsync(StateHasChanged);		
+	}
+
+
+	public void OkButtonClick()
+	{
+		ShowPopup = false;
+		PopupMode = CtrlMode.cmBrowse;
+		InvokeAsync(StateHasChanged);
+
+		OkPressed.InvokeAsync(editInstrument);
+		
+	}
+	
+	public void CancelButtonClick(MouseEventArgs args)
+	{
+		ShowPopup = false;
+		PopupMode = CtrlMode.cmBrowse;
+		InvokeAsync(StateHasChanged);
+
+		CancelPressed.InvokeAsync("");
+	}
+}

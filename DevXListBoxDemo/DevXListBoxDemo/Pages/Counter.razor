@@ -1,0 +1,34 @@
+﻿@page "/counter"
+@inject BookService bookService
+
+<h1>Coronavirus Shutdown Reading List</h1>
+<h2>Multi Select DevExpress</h2>
+
+<DxListBox Data="@bookService.Books"
+           SelectionMode="ListBoxSelectionMode.Multiple"
+           TextFieldName="Title"
+           @bind-SelectedItems="@SelectedBooks">
+</DxListBox>
+<br />
+@foreach (var book in SelectedBooks)
+{
+    <div>Id: @book.Id.ToString()</div>
+    <div>Title: @book.Title</div>
+    <div>Description: @book.Description</div>
+    <br/>
+}
+
+@code
+{
+    IEnumerable<Book> selectedBooks;
+    IEnumerable<Book> SelectedBooks
+    {
+        get => selectedBooks;
+        set { selectedBooks = value; InvokeAsync(StateHasChanged); }
+    }
+
+    protected override void OnInitialized()
+    {
+        SelectedBooks = bookService.Books.Take(1);
+    }
+}

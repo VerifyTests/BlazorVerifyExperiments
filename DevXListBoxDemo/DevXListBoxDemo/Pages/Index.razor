@@ -1,0 +1,43 @@
+﻿@page "/"
+@inject BookService bookService
+
+<h1>Coronavirus Shutdown Reading List</h1>
+<h2>Single Select Manual</h2>
+
+<select class="form-control" size="4" style="width:100%;" @onchange="BookSelected">
+    @foreach (var book in bookService.Books)
+    {
+        @if (SelectedBook != null && book.Id == SelectedBook.Id)
+        {
+            <option selected value="@book.Id">@book.Title</option>
+        }
+        else
+        {
+            <option value="@book.Id">@book.Title</option>
+        }
+    }
+</select>
+<br />
+<br />
+
+@if (SelectedBook != null)
+{
+    <div>Id: @SelectedBook.Id.ToString()</div>
+    <div>Title: @SelectedBook.Title</div>
+    <div>Description: @SelectedBook.Description</div>
+    <br />
+}
+
+@code {
+
+    Book SelectedBook;
+
+    void BookSelected(ChangeEventArgs args)
+    {
+        int Id = Convert.ToInt32(args.Value);
+        SelectedBook = (from x in bookService.Books
+                    where x.Id == Id
+                    select x).First();
+    }
+
+}

@@ -1,0 +1,43 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29924.181
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BandBooker", "BandBooker\BandBooker.csproj", "{C4842ADA-7410-4650-ADEF-DD231FEAC6A9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BandBookerWasm.Server", "BandBookerWasm\Server\BandBookerWasm.Server.csproj", "{FD6684E4-08FB-47A1-9072-3B7DDC4D33DE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BandBookerWasm.Client", "BandBookerWasm\Client\BandBookerWasm.Client.csproj", "{526396F1-3692-4CA2-AF14-A2755D80BBF3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BandBookerWasm.Shared", "BandBookerWasm\Shared\BandBookerWasm.Shared.csproj", "{4169ED2C-5BD7-48BA-AEE6-091E26533E55}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C4842ADA-7410-4650-ADEF-DD231FEAC6A9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C4842ADA-7410-4650-ADEF-DD231FEAC6A9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C4842ADA-7410-4650-ADEF-DD231FEAC6A9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C4842ADA-7410-4650-ADEF-DD231FEAC6A9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FD6684E4-08FB-47A1-9072-3B7DDC4D33DE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FD6684E4-08FB-47A1-9072-3B7DDC4D33DE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FD6684E4-08FB-47A1-9072-3B7DDC4D33DE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FD6684E4-08FB-47A1-9072-3B7DDC4D33DE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{526396F1-3692-4CA2-AF14-A2755D80BBF3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{526396F1-3692-4CA2-AF14-A2755D80BBF3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{526396F1-3692-4CA2-AF14-A2755D80BBF3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{526396F1-3692-4CA2-AF14-A2755D80BBF3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4169ED2C-5BD7-48BA-AEE6-091E26533E55}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4169ED2C-5BD7-48BA-AEE6-091E26533E55}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4169ED2C-5BD7-48BA-AEE6-091E26533E55}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4169ED2C-5BD7-48BA-AEE6-091E26533E55}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {CD215BF8-27C8-4E5F-A330-8793453B5C9B}
+	EndGlobalSection
+EndGlobal

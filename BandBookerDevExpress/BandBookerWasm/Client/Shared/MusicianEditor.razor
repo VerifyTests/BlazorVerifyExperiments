@@ -1,0 +1,111 @@
+﻿@using BandBookerWasm.Shared;
+@using BandBookerWasm.Shared.Models;
+@inject IJSRuntime js;
+
+    <DxPopup CssClass="custom-popup" HeaderText="@MusicianEditingCaption"
+             @bind-Visible="@ShowPopup">
+        <ChildContent>
+            <EditForm Model="@editItem" OnValidSubmit="@OkButtonClick">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+                Name:
+                <InputText id="musician.name" @bind-Value="@editItem.Name"
+                                            type="text" style="width:100%;" /><br />
+                <DXObjectPicker AllItems="AllInstruments"
+                              SelectedItems="editItem.Instruments"
+                              ItemType="Instrument"
+                              ItemTypePlural="Instruments"
+                              TextPropertyName="Name"
+                              ValuePropertyName="Id">
+                </DXObjectPicker>
+
+            </EditForm>
+
+        </ChildContent>
+        <FooterTemplate>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" @onclick="@OkButtonClick">OK</button>
+                <button type="button" class="btn btn-primary" @onclick="@CancelButtonClick">Cancel</button>
+            </div>
+        </FooterTemplate>
+    </DxPopup>
+
+
+@code {
+		static readonly Dictionary<CtrlMode, string> popupCaption = new Dictionary<CtrlMode, string> {
+			{CtrlMode.cmBrowse, "Browse {0}s" },
+			{CtrlMode.cmEdit, "Editing {0}" },
+			{CtrlMode.cmInsert, "Inserting {0}" }
+	};
+
+		public enum CtrlMode
+	{
+		cmBrowse = 0,
+		cmInsert = 1,
+		cmEdit = 2
+	}
+
+	public bool ShowPopup { get; set; }
+	public CtrlMode PopupMode { get; set; } = CtrlMode.cmBrowse;
+	public string MusicianEditingCaption { get => String.Format(popupCaption[PopupMode], "Musician"); }
+
+	
+	[Parameter]
+	public List<Instrument> AllInstruments { get; set; }
+	
+
+	[Parameter]
+	public EventCallback<string> CancelPressed { get; set; }
+
+	[Parameter]
+	public EventCallback<Musician> OkPressed{ get; set; }
+
+	private Musician originalItem = null;
+	private Musician editItem = new Musician();
+
+	public void NewMusician()
+	{
+		editItem = new Musician();
+		PopupMode = CtrlMode.cmInsert;
+		ShowPopup = true;
+		js.InvokeVoidAsync("SetFocus", "musician.name");
+		InvokeAsync(StateHasChanged);
+
+	}
+
+	public void EditMusician(Musician item)
+	{
+		originalItem = item;
+		editItem = new Musician
+		{
+			Id = item.Id,
+			Name = item.Name,
+			Instruments = new List<Instrument>(item.Instruments)
+		};
+		PopupMode = CtrlMode.cmInsert;
+		ShowPopup = true;
+		js.InvokeVoidAsync("SetFocus", "musician.name");
+		InvokeAsync(StateHasChanged);
+	}
+
+
+	public void OkButtonClick()
+	{
+		ShowPopup = false;
+		PopupMode = CtrlMode.cmBrowse;
+		InvokeAsync(StateHasChanged);
+
+		OkPressed.InvokeAsync(editItem);
+
+	}
+
+	public void CancelButtonClick(MouseEventArgs args)
+	{
+		ShowPopup = false;
+		PopupMode = CtrlMode.cmBrowse;
+		InvokeAsync(StateHasChanged);
+
+		CancelPressed.InvokeAsync("");
+	}
+	
+}

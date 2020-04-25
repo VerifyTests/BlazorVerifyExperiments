@@ -1,0 +1,97 @@
+﻿@page "/"
+@namespace DevXListBoxDemo.Pages
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DevXListBoxDemo</title>
+    <base href="~/" />
+    <link rel="stylesheet" href="css/bootstrap/bootstrap.min.css" />
+    <link href="css/site.css" rel="stylesheet" />
+    <link href="_content/DevExpress.Blazor/dx-blazor.css" rel="stylesheet" />
+</head>
+<body>
+    <app>
+        <component type="typeof(App)" render-mode="ServerPrerendered" />
+    </app>
+
+    <div id="blazor-error-ui">
+        <environment include="Staging,Production">
+            An error has occurred. This application may no longer respond until reloaded.
+        </environment>
+        <environment include="Development">
+            An unhandled exception has occurred. See browser dev tools for details.
+        </environment>
+        <a href="" class="reload">Reload</a>
+        <a class="dismiss">🗙</a>
+    </div>
+
+    <script src="_framework/blazor.server.js"></script>
+
+
+
+    <!--functions-->
+    <script>
+        window.dropdown = {
+            custom_select: function (id, values, multiple) {
+
+                if (values != undefined) {
+                    if (multiple) {
+                        if (Array.isArray(values)) {
+                            var selectValues = values;
+                        }
+                        else {
+                            var selectValues = values.split(',');
+                        }
+
+                        var selector = '#' + id + ' option';
+
+                        /* Iterate options of select element */
+                        for (const option of document.querySelectorAll(selector)) {
+                            /* Parse value to integer */
+                            const value = option.value;
+
+                            /* If option value contained in values, set selected attribute */
+                            if (selectValues.indexOf(value) !== -1) {
+                                option.setAttribute('selected', 'selected');
+                            }
+                            /* Otherwise ensure no selected attribute on option */
+                            else {
+                                option.removeAttribute('selected');
+                            }
+                        }
+                    }
+                    else {
+                        document.getElementById(id).value = values;
+                    }
+                }
+            },
+            getSelectValues: function (select) {
+                var result = [];
+                var options = select && select.options;
+                var opt;
+
+                for (var i = 0, iLen = options.length; i < iLen; i++) {
+                    opt = options[i];
+
+                    if (opt.selected) {
+                        result.push(opt.value || opt.text);
+                    }
+                }
+                return result;
+            },
+            onOptionSelect: function (dotNetObject, selectId) {
+                var values = dropdown.getSelectValues(document.getElementById(selectId));
+                dotNetObject.invokeMethodAsync('onOptionSelect', selectId, values);
+            },
+        }
+    </script>
+   
+</body>
+</html>

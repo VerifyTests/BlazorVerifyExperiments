@@ -1,0 +1,94 @@
+﻿@using BandBookerWasm.Shared;
+@using BandBookerWasm.Shared.Models;
+@inject IJSRuntime js;
+
+@if (@Musician != null && @ShowMusicianPanel == true)
+{
+	<div style="background-color:lightgray;">
+		<div style="padding:1vw;">
+			Name:<br />
+			<input id="musician.name" @bind="Musician.Name" />
+			<br />
+			<DxTagBox NullText="Select some instruments"
+					  Data="@AllInstruments"
+					  @bind-SelectedItems="@SelectedInstruments"
+					  TextFieldName="Name"
+					  />
+			@*<ObjectPicker AllItems="AllInstruments"
+						  SelectedItems="Musician.Instruments"
+						  ItemType="Instrument"
+						  ItemTypePlural="Instruments"
+						  TextPropertyName="Name"
+						  ValuePropertyName="Id">
+			</ObjectPicker>*@
+			<br />
+			<button type="button" @onclick="SubmitButtonPressed">@SubmitButtonText</button>
+			<span>&nbsp;</span>
+			<button type="button" @onclick="CancelButtonPressed">Cancel</button>
+		</div>
+	</div>
+}
+
+
+@code {
+	Musician Musician = new Musician();
+	bool ShowMusicianPanel = false;
+	bool Adding = false;
+	string SubmitButtonText = "Update";
+
+	IEnumerable<Instrument> SelectedInstruments { get; set; } // <-- added
+
+	[Parameter]
+	public List<Instrument> AllInstruments { get; set; }
+
+	[Parameter]
+	public EventCallback<string> CancelPressed { get; set; }
+
+	[Parameter]
+	public EventCallback<Musician> MusicianAdded { get; set; }
+
+	[Parameter]
+	public EventCallback<Musician> MusicianUpdated { get; set; }
+
+	public async Task NewMusician(List<Instrument> Instruments)
+	{
+		this.Musician = new Musician();
+		AllInstruments = Instruments;
+		SelectedInstruments = new List<Instrument>(); // <-- added
+		Adding = true;
+		SubmitButtonText = "Add";
+		ShowMusicianPanel = true;
+		await js.InvokeVoidAsync("SetFocus", "musician.name");
+	}
+
+	public async Task EditMusician(List<Instrument> Instruments, Musician Musician)
+	{
+		AllInstruments = Instruments;
+		SelectedInstruments = Musician.Instruments; // <-- added
+		Adding = false;
+		SubmitButtonText = "Update";
+		this.Musician = Musician;
+		ShowMusicianPanel = true;
+		await js.InvokeVoidAsync("SetFocus", "musician.name");
+	}
+
+	async Task CancelButtonPressed()
+	{
+		ShowMusicianPanel = false;
+		await CancelPressed.InvokeAsync("");
+	}
+
+	async Task SubmitButtonPressed()
+	{
+		ShowMusicianPanel = false;
+		Musician.Instruments = SelectedInstruments.ToList(); // <-- added
+		if (Adding)
+		{
+			await MusicianAdded.InvokeAsync(this.Musician);
+		}
+		else
+		{
+			await MusicianUpdated.InvokeAsync(this.Musician);
+		}
+	}
+}

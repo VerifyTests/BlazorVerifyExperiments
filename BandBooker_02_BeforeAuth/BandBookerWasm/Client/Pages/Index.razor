@@ -1,0 +1,77 @@
+﻿@page "/"
+
+<h2>Instruments</h2>
+<select @onchange="InstrumentSelected" disabled="@DisableInstrumentList" size="10" style="width:100%;">
+    @foreach (var instrument in Instruments)
+    {
+        @if (SelectedInstrument != null
+       && instrument.Id == SelectedInstrument.Id)
+        {
+            <option selected value="@instrument.Id.ToString()">
+                @instrument.Name
+            </option>
+        }
+        else
+        {
+            <option value="@instrument.Id.ToString()">@instrument.Name</option>
+        }
+    }
+</select>
+<button @onclick="NewInstrumentButtonClick">New</button>
+&nbsp;
+<button disabled="@DisableInstrumentEditButton" @onclick="EditInstrumentButtonClick">Edit</button>
+&nbsp;
+<button disabled="@DisableInstrumentEditButton" @onclick="DeleteInstrumentButtonClick">Delete</button>
+<br />
+<span style="color:red;">@InstrumentErrorMessage</span>
+
+<InstrumentEditor @ref="instrumentEditor"
+                  Instrument="SelectedInstrument"
+                  CancelPressed="InstrumentCancelled"
+                  InstrumentAdded="InstrumentAdded"
+                  InstrumentUpdated="InstrumentUpdated">
+</InstrumentEditor>
+<br />
+<br />
+
+<h2>Musicians</h2>
+<select @onchange="MusicianSelected"
+        size="10" style="width:100%;"
+        disabled="@DisableMusicianControls">
+    @foreach (var musician in Musicians)
+    {
+        if (SelectedMusician != null && musician.Id == SelectedMusician.Id)
+        {
+            <option selected value="@musician.Id.ToString()">@musician.Name</option>
+        }
+        else
+        {
+            <option value="@musician.Id.ToString()">@musician.Name</option>
+        }
+    }
+</select>
+<button disabled="@DisableMusicianControls"
+        @onclick="NewMusicianButtonClick">
+    New
+</button>
+<span>&nbsp;</span>
+
+<button disabled="@DisableMusicianEditButton"
+        @onclick="EditMusicianButtonClick">
+    Edit
+</button>
+<span>&nbsp;</span>
+
+<button disabled="@DisableMusicianEditButton"
+        @onclick="DeleteMusicianButtonClick">
+    Delete
+</button>
+<br />
+
+<MusicianEditor @ref="musicianEditor"
+                CancelPressed="EditMusicianCancelled"
+                MusicianAdded="MusicianAdded"
+                MusicianUpdated="MusicianUpdated">
+</MusicianEditor>
+<br />
+<br />

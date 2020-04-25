@@ -1,0 +1,86 @@
+﻿@using Microsoft.AspNetCore.Components.Web;
+@using BandBookerWasm.Shared.Models;
+@inject IJSRuntime js;
+
+@if (@ShowInstrumentPanel == true)
+{
+    <div style="background-color:lightgray;">
+        <div style="padding:1vw;">
+            <EditForm Model="@editInstrument" OnValidSubmit="@SubmitButtonPressed">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+                Name:
+                <InputText id="instrument.name" @bind-Value="@editInstrument.Name"
+                                            type="text" style="width:100%;" />
+                <br /><br />
+                <button type="submit">@SubmitButtonText</button>
+                <span>&nbsp;</span>
+                <button type="button" @onclick="CancelButtonPressed">Cancel</button>
+            </EditForm>
+        </div>
+    </div>
+}
+
+@code {
+
+    [Parameter]
+    public EventCallback<string> CancelPressed { get; set; }
+
+    [Parameter]
+    public EventCallback<Instrument> InstrumentAdded { get; set; }
+
+    [Parameter]
+    public EventCallback<string> InstrumentUpdated { get; set; }
+
+    [Parameter]
+    public Instrument Instrument { get; set; }
+
+    private Instrument editInstrument = new Instrument();
+
+    bool ShowInstrumentPanel = false;
+    string SubmitButtonText = "";
+    bool Adding = false;
+
+    public void Hide()
+    {
+        ShowInstrumentPanel = false;
+    }
+
+    public async Task NewInstrument()
+    {
+        Adding = true;
+        SubmitButtonText = "Add";
+        editInstrument = new Instrument();
+        ShowInstrumentPanel = true;
+        await js.InvokeVoidAsync("SetFocus", "instrument.name");
+    }
+
+    public async Task EditInstrument()
+    {
+        Adding = false;
+        SubmitButtonText = "Update";
+        editInstrument = new Instrument();
+        editInstrument.Name = Instrument.Name;
+        ShowInstrumentPanel = true;
+        await js.InvokeVoidAsync("SetFocus", "instrument.name");
+    }
+
+    async Task SubmitButtonPressed()
+    {
+        if (Adding)
+        {
+            await InstrumentAdded.InvokeAsync(editInstrument);
+        }
+        else
+        {
+            Instrument.Name = editInstrument.Name;
+            await InstrumentUpdated.InvokeAsync("");
+        }
+    }
+
+    async Task CancelButtonPressed()
+    {
+        ShowInstrumentPanel = false;
+        await CancelPressed.InvokeAsync("");
+    }
+}

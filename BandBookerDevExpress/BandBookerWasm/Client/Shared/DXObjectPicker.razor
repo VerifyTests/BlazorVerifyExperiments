@@ -1,0 +1,176 @@
+﻿@typeparam TItem
+@using BandBookerWasm.Shared
+
+<table style="width:100%">
+	<tr>
+		<td style="width:45%;" valign="top">
+			All @ItemTypePlural<br />
+		</td>
+		<td style="width:10%;" valign="top">
+			<span>&nbsp;</span>
+		</td>
+		<td style="width:45%;" valign="top">
+			Selected @ItemTypePlural<br />
+		</td>
+	</tr>
+	<tr>
+		<td style="width:45%;" valign="top">
+			<DxListBox Data="@RemainingItems" TextFieldName="@TextPropertyName"
+					   SelectedItems="@RemainingSelection"
+					   SelectedItemsChanged="@RemainingSelectionChanged">
+
+			</DxListBox>
+		</td>
+		<td style="width:10%;" valign="top">
+			<button @onclick="AddSelectedItem"
+					type="button"
+					disabled="@AddSelectedItemButtonDisabled"
+					style="width:100%;">
+				&gt;
+			</button><br />
+			<button @onclick="@AddAllItems"
+					type="button"
+					style="width:100%;">
+				&gt;&gt;
+			</button><br />
+			<button @onclick="@RemoveSelectedItem"
+					type="button"
+					disabled="@RemoveSelectedItemButtonDisabled"
+					style="width:100%;">
+				&lt;
+			</button><br />
+			<button @onclick="@RemoveAllItems"
+					type="button"
+					style="width:100%;">
+				&lt;&lt;
+			</button><br />
+		</td>
+		<td style="width:45%;" valign="top">
+			<DxListBox Data="@SelectedItems" TextFieldName="@TextPropertyName"
+					   SelectedItems="@SelectedSelection"
+					   SelectedItemsChanged="@SelectedSelectionChanged">
+			</DxListBox>
+		</td>
+	</tr>
+</table>
+
+@code {
+
+	//DxListBox<TItem> allGrid;
+	//DxListBox<TItem> selGrid;
+	//Guid allKey;
+	//Guid selKey;
+
+	//protected void GridRefresh()
+	//{
+	//	allKey = Guid.NewGuid();
+	//	selKey = Guid.NewGuid();
+	//}
+	public string SelectedItemTypePlural { get => $"Selected {ItemTypePlural}"; }
+	public string AllItemTypePlural { get => $"All {ItemTypePlural}"; }
+
+
+	[Parameter]
+	public string ItemType { get; set; }
+
+	[Parameter]
+	public string ItemTypePlural { get; set; }
+
+	[Parameter]
+	public string TextPropertyName { get; set; }
+
+	[Parameter]
+	public string ValuePropertyName { get; set; }
+
+	[Parameter]
+	public List<TItem> AllItems { get; set; }
+
+	[Parameter] public List<TItem> SelectedItems { get; set; }
+
+	public List<TItem> RemainingItems
+	{
+		get => AllItems.Where(x => !SelectedItems.Contains(x)).ToList();
+		set { var dummy = value; }
+	}
+
+	bool AddSelectedItemButtonDisabled = true;
+	bool RemoveSelectedItemButtonDisabled = true;
+
+
+	IEnumerable<TItem> RemainingSelection{ get; set; }
+
+	void RemainingSelectionChanged(IEnumerable<TItem> selectedItems){
+		RemainingSelection = selectedItems;
+		//InvokeAsync(StateHasChanged);
+	}
+
+	IEnumerable<TItem> SelectedSelection { get; set; }
+
+	void SelectedSelectionChanged(IEnumerable<TItem> selectedItems){
+		SelectedSelection = selectedItems;
+		//InvokeAsync(StateHasChanged);
+	}
+
+	protected override void OnParametersSet()
+	{
+		if (RemainingItems.Count() > 0)
+		{
+			RemainingSelection = RemainingItems.Take(1).ToList();
+		}
+		else if (SelectedItems.Count() > 0)
+		{
+			SelectedSelection = SelectedItems.Take(1).ToList();
+		}
+		UpdateButtonEnabledStates();
+	}
+
+	void UpdateButtonEnabledStates()
+	{
+		AddSelectedItemButtonDisabled = !RemainingItems.Any();
+		RemoveSelectedItemButtonDisabled = !SelectedItems.Any();
+
+		//GridRefresh(); // <-- added
+		InvokeAsync(StateHasChanged);
+	}
+
+	void AddAllItems()
+	{
+		SelectedItems.AddRange(AllItems);
+		if (SelectedItems.Count > 0)
+		{
+			SelectedSelection = SelectedItems.Take(1).ToList();
+		}
+		AllItems.Clear();
+		UpdateButtonEnabledStates();
+	}
+
+	void RemoveAllItems()
+	{
+		SelectedItems.Clear();
+		if (RemainingItems.Count() > 0)
+		{
+			SelectedSelection = SelectedItems.Take(1).ToList();
+		}
+		UpdateButtonEnabledStates();
+	}
+
+	void AddSelectedItem()
+	{
+		if (RemainingSelection.Count() > 0)
+		{
+			SelectedItems.AddRange(RemainingSelection);
+			UpdateButtonEnabledStates();
+		}
+	}
+
+	void RemoveSelectedItem()
+	{
+		if (SelectedSelection.Count() > 0)
+		{
+			SelectedItems = SelectedItems.Where(x => !SelectedSelection.Contains(x)).ToList();
+			UpdateButtonEnabledStates();
+		}
+
+	}
+
+}

@@ -1,0 +1,100 @@
+﻿@typeparam TItem
+@inject IJSRuntime jsRuntime
+
+<select id="@uniqueID" class="@classNames" multiple="@multiple" @onchange="OnChange" size="4">
+    @if (title != null)
+    {
+        <option selected disabled value="null">@title</option>
+    }
+    <CascadingValue name="Dropdown" Value="@this">
+        @ChildContent
+    </CascadingValue>
+</select>
+
+@code {
+
+    // Code shamelessly stolen from Ashke98 on medium.com
+    // https://medium.com/@ashke98/how-i-could-handle-selectlist-in-blazor-cff9f91d096d
+    // Also check out the JavaScript requried in _Hosts.cshtml
+
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+
+    [Parameter]
+    public List<TItem> values { get; set; }
+
+    [Parameter]
+    public Action<List<TItem>> valuesChanged { get; set; }
+
+    [Parameter] public EventCallback<string> update { get; set; }
+
+    [Parameter]
+    public string title { get; set; }
+
+    [Parameter]
+    public bool multiple { get; set; }
+
+    [Parameter]
+    public string classNames { get; set; }
+
+    private string uniqueID = "randomSelectListID";
+
+    private static T ConvertByType<T>(object obj)
+    {
+        if (obj is T)
+        {
+            return (T)obj;
+        }
+        try
+        {
+            return (T)Convert.ChangeType(obj, typeof(T));
+        }
+        catch (InvalidCastException)
+        {
+            return default(T);
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+        }
+
+        await jsRuntime.InvokeAsync<object>("dropdown.custom_select", uniqueID, String.Join(",", values), multiple);
+    }
+
+    public void OnChange(ChangeEventArgs e)
+    {
+        jsRuntime.InvokeVoidAsync("dropdown.onOptionSelect", DotNetObjectReference.Create(this), uniqueID);
+    }
+
+    [JSInvokable("onOptionSelect")]
+    public async Task<bool> onOptionSelect(string selectId, List<string> selectedValues)
+    {
+        try
+        {
+            if (values != null)
+            {
+                values = selectedValues.Select(x => ConvertByType<TItem>(x)).ToList();
+            }
+            else
+            {
+                values.Clear();
+            }
+
+            valuesChanged.Invoke(values);
+
+            StateHasChanged();
+
+            await update.InvokeAsync("Hello from ChildComponent");
+
+            return await Task.FromResult(true);
+        }
+        catch
+        {
+            return await Task.FromResult(false);
+        }
+    }
+
+}

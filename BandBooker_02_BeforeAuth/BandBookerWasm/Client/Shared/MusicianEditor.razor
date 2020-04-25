@@ -1,0 +1,88 @@
+﻿@using BandBookerWasm.Shared;
+@using BandBookerWasm.Shared.Models;
+@inject IJSRuntime js;
+
+@if (@Musician != null && @ShowMusicianPanel == true)
+{
+    <div style="background-color:lightgray;">
+        <div style="padding:1vw;">
+            Name:<br />
+            <input id="musician.name" @bind="Musician.Name" />
+            <br />
+            <ObjectPicker AllItems="AllInstruments"
+                          SelectedItems="Musician.Instruments"
+                          ItemType="Instrument"
+                          ItemTypePlural="Instruments"
+                          TextPropertyName="Name"
+                          ValuePropertyName="Id">
+            </ObjectPicker>
+            <br />
+            <button type="button" @onclick="SubmitButtonPressed">@SubmitButtonText</button>
+            <span>&nbsp;</span>
+            <button type="button" @onclick="CancelButtonPressed">Cancel</button>
+        </div>
+    </div>
+}
+
+
+@code {
+    Musician Musician = new Musician();
+    bool ShowMusicianPanel = false;
+    bool Adding = false;
+    string SubmitButtonText = "Update";
+
+    [Parameter]
+    public List<Instrument> AllInstruments { get; set; }
+
+    [Parameter]
+    public EventCallback<string> CancelPressed { get; set; }
+
+    [Parameter]
+    public EventCallback<Musician> MusicianAdded { get; set; }
+
+    [Parameter]
+    public EventCallback<Musician> MusicianUpdated { get; set; }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await js.InvokeVoidAsync("SetFocus", "musician.name");
+        await base.OnAfterRenderAsync(firstRender);
+    }
+
+    public void NewMusician(List<Instrument> Instruments)
+    {
+        this.Musician = new Musician();
+        AllInstruments = Instruments;
+        Adding = true;
+        SubmitButtonText = "Add";
+        ShowMusicianPanel = true;
+    }
+
+    public void EditMusician(List<Instrument> Instruments, Musician Musician)
+    {
+        AllInstruments = Instruments;
+        Adding = false;
+        SubmitButtonText = "Update";
+        this.Musician = Musician;
+        ShowMusicianPanel = true;
+    }
+
+    async Task CancelButtonPressed()
+    {
+        ShowMusicianPanel = false;
+        await CancelPressed.InvokeAsync("");
+    }
+
+    async Task SubmitButtonPressed()
+    {
+        ShowMusicianPanel = false;
+        if (Adding)
+        {
+            await MusicianAdded.InvokeAsync(this.Musician);
+        }
+        else
+        {
+            await MusicianUpdated.InvokeAsync(this.Musician);
+        }
+    }
+}

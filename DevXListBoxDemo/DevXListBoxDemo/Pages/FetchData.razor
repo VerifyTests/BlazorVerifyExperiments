@@ -1,0 +1,45 @@
+﻿@page "/fetchdata"
+@inject BookService bookService
+
+<h1>Coronavirus Shutdown Reading List</h1>
+<h2>Multi Select Manual</h2>
+
+<SelectMultiple @bind-values="SelectedBookIds" multiple="@(true)" update="update" classNames="@("form-control")">
+    @foreach (var book in bookService.Books)
+    {
+        <option value="@book.Id">@book.Title</option>
+    }
+</SelectMultiple>
+<br />
+<div>
+    @if (SelectedBookIds == null || SelectedBookIds.Count == 0)
+    {
+        <h3>No books selected!</h3>
+    }
+    else
+    {
+        @foreach (var item in SelectedBookIds)
+        {
+            var book = (from x in bookService.Books
+                        where x.Id == Convert.ToInt32(item)
+                        select x).FirstOrDefault();
+            if (book != null)
+            {
+                <div>Id: @book.Id.ToString()</div>
+                <div>Title: @book.Title</div>
+                <div>Description: @book.Description</div>
+                <br />
+            }
+        }
+    }
+</div>
+@code
+{
+    List<string> SelectedBookIds = new List<string>();
+
+    void update(string newMessage)
+    {
+        StateHasChanged();
+    }
+
+}
