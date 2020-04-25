@@ -16,19 +16,19 @@
 <div class="card">
     <div class="card-body">
         <h5 class="card-title">Please enter your details</h5>
-        <EditForm Model="loginModel" OnValidSubmit="HandleLogin">
+        <EditForm Model="LoginModel" OnValidSubmit="HandleLogin">
             <DataAnnotationsValidator />
             <ValidationSummary />
 
             <div class="form-group">
                 <label for="email">Email address</label>
-                <InputText Id="email" Class="form-control" @bind-Value="loginModel.Email" />
-                <ValidationMessage For="@(() => loginModel.Email)" />
+                <InputText Id="email" Class="form-control" @bind-Value="LoginModel.Email" />
+                <ValidationMessage For="@(() => LoginModel.Email)" />
             </div>
             <div class="form-group">
                 <label for="password">Password</label>
-                <InputText Id="password" type="password" Class="form-control" @bind-Value="loginModel.Password" />
-                <ValidationMessage For="@(() => loginModel.Password)" />
+                <InputText Id="password" type="password" Class="form-control" @bind-Value="LoginModel.Password" />
+                <ValidationMessage For="@(() => LoginModel.Password)" />
             </div>
             <button type="submit" class="btn btn-primary">Submit</button>
         </EditForm>
@@ -37,7 +37,7 @@
 
 @code {
 
-    private LoginModel loginModel = new LoginModel();
+    public LoginModel LoginModel = new LoginModel();
     private bool ShowErrors;
     private string Error = "";
 
@@ -45,7 +45,7 @@
     {
         ShowErrors = false;
 
-        var result = await AuthService.Login(loginModel);
+        var result = await AuthService.Login(LoginModel);
 
         if (result.Successful)
         {

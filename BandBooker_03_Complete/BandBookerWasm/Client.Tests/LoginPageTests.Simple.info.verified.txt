@@ -1,0 +1,8 @@
+{
+  Instance: {
+    LoginModel: {
+      Email: 'a@b.com',
+      Password: 'thePassword'
+    }
+  }
+}

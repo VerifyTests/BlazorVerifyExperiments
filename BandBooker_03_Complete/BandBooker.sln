@@ -11,6 +11,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BandBookerWasm.Client", "Ba
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BandBookerWasm.Shared", "BandBookerWasm\Shared\BandBookerWasm.Shared.csproj", "{4169ED2C-5BD7-48BA-AEE6-091E26533E55}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BandBookerWasm.Client.Tests", "BandBookerWasm\Client.Tests\BandBookerWasm.Client.Tests.csproj", "{B5EB9F50-A0CB-4920-9D78-054897AAA010}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{4169ED2C-5BD7-48BA-AEE6-091E26533E55}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4169ED2C-5BD7-48BA-AEE6-091E26533E55}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4169ED2C-5BD7-48BA-AEE6-091E26533E55}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B5EB9F50-A0CB-4920-9D78-054897AAA010}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B5EB9F50-A0CB-4920-9D78-054897AAA010}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B5EB9F50-A0CB-4920-9D78-054897AAA010}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B5EB9F50-A0CB-4920-9D78-054897AAA010}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
